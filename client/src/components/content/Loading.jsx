@@ -1,8 +1,8 @@
 const Loading = () => {
     return (
-        <div class="text-center loading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+        <div className="text-center loading">
+            <div className="spinner-border" role="status">
+                <span className="visually-hidden">Загрузка...</span>
             </div>
         </div>
     );

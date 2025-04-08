@@ -12,6 +12,7 @@ import PostEdit from "./views/PostEdit";
 import CreateProfile from "./views/CreateProfile";
 import Admin from "./views/Admin";
 import UserPage from "./views/UserPage";
+import GetUsers from "./views/GetUsers";
 
 import "./styles/global.css";
 
@@ -75,6 +76,11 @@ function App() {
                                 exact
                                 path="/admin"
                                 element={isLogged ? (role == '2' ? <Admin /> : <Navigate to="/" />) : <Navigate to="/auth" />}
+                            />
+                            <Route
+                                exact
+                                path="/users"
+                                element={isLogged ? <GetUsers /> : <Navigate to="/auth" />}
                             />
                             <Route path="*" element={<Navigate to="/" />} />
                         </>

@@ -1,0 +1,33 @@
+.profile {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.profile h2 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: white;
+}
+
+.modal {
+    position: absolute !important;
+    background: rgba(0, 0, 0, 0.816) !important;
+}
+
+.avatar-box {
+    text-align: center;
+}
+
+.avatar {
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+    width: 100px;
+    border: 2px solid white;
+    overflow: hidden;
+}

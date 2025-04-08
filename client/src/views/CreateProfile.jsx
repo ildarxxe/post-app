@@ -20,7 +20,7 @@ const CreateProfile = () => {
                 formData.append('avatar', avatar);
 
                 if (!requestSent.current) {
-                    fetch('http://127.0.0.1:8000/api/profile/create', {
+                    fetch('http://127.0.0.1:8000/api/profile', {
                         method: 'POST',
                         headers: {
                             "Authorization": "Bearer " + localStorage.getItem('token')

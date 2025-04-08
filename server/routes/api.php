@@ -13,12 +13,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/user/create', [UserController::class, 'create']); // create
         Route::post('/user/auth', [UserController::class, 'login']); // auth
     });
-    
+
     Route::get('/user', [UserController::class, 'get']); // read
-    Route::get('/users', [UserController::class, 'getAll']); // update with user
+    Route::get('/users', [UserController::class, 'getAll']);
+    Route::get('/get/user', [UserController::class, 'getById']);
     Route::delete('/user', [UserController::class, 'delete']); // delete
 
-    Route::post('/profile/create', [ProfileController::class, 'create']); // create
     Route::get('/profile', [ProfileController::class, 'get']);  // read
     Route::post('/profile', [ProfileController::class, 'update']); // update with user
 

@@ -45,6 +45,14 @@ const Header = () => {
                                             Профиль
                                         </Link>
                                     </li>
+                                    <li>
+                                        <Link
+                                            to="/users"
+                                            className="text-white"
+                                        >
+                                            Пользователи
+                                        </Link>
+                                    </li>
                                     {role == "2" ? <li>
                                         <Link
                                             to="/admin"

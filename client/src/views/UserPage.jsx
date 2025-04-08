@@ -53,7 +53,7 @@ const UserPage = () => {
                         spans[1].textContent = `Имя: ${info.name}`;
                         spans[2].textContent = `Email: ${info.email}`;
                     } else {
-                        spans[0].src = info.avatar !== '' ? info.avatar : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQl76RcRXSNxcN_jBJrSPDxL5lNfxYbNUMHTw&s';
+                        spans[0].src = info.avatar !== '' ? info.avatar : process.env.REACT_APP_STATIC_IMAGE;
                         spans[3].textContent = `Биография: ${info.bio}`;
                         spans[4].textContent = `Адресс: ${info.address}`;
                     }

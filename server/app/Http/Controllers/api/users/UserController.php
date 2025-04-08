@@ -22,7 +22,13 @@ class UserController extends Controller
         ]);
         $data['password'] = Hash::make($data['password']);
         try {
-            User::create($data);
+            $user = User::create($data);
+            Profile::create([
+                'user_id' => $user->id,
+                'bio' => '',
+                'address' => '',
+                'avatar' => ''
+            ]);
             return response()->json(['message' => "success"]);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th]);
@@ -50,7 +56,7 @@ class UserController extends Controller
     {
         $user_id = Auth::user()->id;
         $profile = Profile::where('user_id', $user_id)->first();
-        if ($profile) {
+        if ($profile->bio) {
             $isProfile = true;
         } else {
             $isProfile = false;
@@ -82,5 +88,19 @@ class UserController extends Controller
     {
         $users = User::all();
         return response()->json($users);
+    }
+
+    public function getById(Request $request)
+    {
+        $query = $request->query('search');
+        $users = User::where('name', 'LIKE', '%' . $query . '%')
+            ->orWhere('name', 'LIKE', '%' . $query . '%')
+            ->orWhere('email', 'LIKE', '%' . $query . '%')
+            ->orWhere('id', 'LIKE', '%' . $query . '%')
+            ->get();
+        if ($users) {
+            return response()->json(['users' => $users]);
+        }
+        return response()->json(['error' => 'Пользователь не найден'], 404);
     }
 }
