@@ -6,6 +6,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setProfile } from '../features/profile/profileSlice.js';
 import { setUserInfo } from '../features/user/userSlice.js';
 import Loading from "../components/content/Loading.jsx";
+
+import headers from '../utils/headersForRequests.js';
+import profileService from "../api/services/ProfileService.js";
+import userService from '../api/services/UserService.js';
 function Profile() {
     const [profileInfo, setProfileInfo] = useState(null);
 
@@ -16,24 +20,12 @@ function Profile() {
     const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         async function getUser() {
-            const data = await fetch('http://127.0.0.1:8000/api/user', {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                }
-            });
-            const user = await data.json();
+            const user = await userService.getMe(headers());
             dispatch(setUserInfo([user]));
         }
 
         async function getProfile() {
-            const data = await fetch('http://127.0.0.1:8000/api/profile', {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                }
-            });
-            const fetchedProfile = await data.json();
+            const fetchedProfile = await profileService.get(headers());
             if (fetchedProfile.error) {
                 alert(fetchedProfile.error)
                 localStorage.setItem('create_profile', true);
@@ -89,24 +81,18 @@ function Profile() {
         setShowModalDelete(true);
     }
     useEffect(() => {
+        async function deleteUser() {
+            const data = await userService.deleteUser(headers());
+            if (data.message === "success") {
+                localStorage.clear();
+                setShowModalLogout(false);
+                window.location.reload();
+            }
+        }
         const btn_confirm = document.querySelector('.btn_confirm');
         if (btn_confirm) {
             btn_confirm.addEventListener('click', function () {
-                fetch('http://127.0.0.1:8000/api/user', {
-                    method: 'DELETE',
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    }
-                })
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.message === "success") {
-                            localStorage.clear();
-                            setShowModalLogout(false);
-                            window.location.reload();
-                        }
-                    })
-                    .catch(e => console.log(e))
+                deleteUser();
             })
         }
 
@@ -145,25 +131,19 @@ function Profile() {
         }
     }, [showModalChange, setShowModalChange, profileInfo, setProfileInfo])
 
+    async function updateProfile(formData) {
+        const data = await profileService.update(formData, headers());
+        if (data.message === "success") {
+            window.location.reload();
+        }
+    }
+
     const submitForm = (e) => {
         e.preventDefault();
         const form = e.target;
         if (form.checkValidity()) {
             const formData = new FormData(form);
-            fetch('http://127.0.0.1:8000/api/profile', {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem('token')
-                },
-                body: formData
-            })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.message === "success") {
-                        window.location.reload();
-                    }
-                })
-                .catch(e => console.log(e))
+            updateProfile(formData)
         }
     }
 

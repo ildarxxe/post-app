@@ -90,7 +90,7 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function getById(Request $request)
+    public function getBySearch(Request $request)
     {
         $query = $request->query('search');
         $users = User::where('name', 'LIKE', '%' . $query . '%')
@@ -102,5 +102,11 @@ class UserController extends Controller
             return response()->json(['users' => $users]);
         }
         return response()->json(['error' => 'Пользователь не найден'], 404);
+    }
+
+    public function getUserById(Request $request, $id)
+    {
+        $user = User::find($id);
+        return $user ? response()->json(['user' => $user]) : response()->json(['Error' => "user not found"]);
     }
 }

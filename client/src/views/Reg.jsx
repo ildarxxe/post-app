@@ -1,5 +1,7 @@
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
+import userService from "../api/services/UserService";
+import headers from '../utils/headersForRequests.js';
 const Reg = () => {
     const [passwordVisibility, setPasswordVisibility] = useState(false);
     const checkPasswordClick = () => {
@@ -9,6 +11,21 @@ const Reg = () => {
     useEffect(() => {
         const form_submit = document.querySelector(".form_submit");
         const form = document.querySelector("form");
+
+        async function create(values) {
+            const data = JSON.stringify({
+                name: values[0],
+                email: values[1],
+                password: values[2],
+            });
+            const headers = headers();
+            const res = userService.createUser(data, headers);
+            if (res.message === "success") {
+                alert("Успешная регистрация");
+                window.location.href = "/auth";
+            }
+        }
+
         form_submit.addEventListener("click", (e) => {
             if (!form.checkValidity()) {
                 e.preventDefault();
@@ -22,25 +39,7 @@ const Reg = () => {
             inputs.forEach((input) => {
                 values.push(input.value);
             });
-            fetch("http://127.0.0.1:8000/api/user/create", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: values[0],
-                    email: values[1],
-                    password: values[2],
-                }),
-            })
-                .then((r) => r.json())
-                .then((data) => {
-                    if (data.message === "success") {
-                        alert("Успешная регистрация");
-                        window.location.href = "/auth";
-                    }
-                })
-                .catch((error) => console.error("Error:", error));
+            create();
         });
     });
     return (

@@ -10,11 +10,6 @@ use App\Http\Controllers\Controller;
 
 class AdminController extends Controller
 {
-    public function getUserById($id)
-    {
-        $user = User::find($id);
-        return response()->json($user);
-    }
     public function getProfileById($id)
     {
         $profile = Profile::where('user_id', $id)->first();

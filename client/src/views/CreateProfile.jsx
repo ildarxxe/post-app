@@ -1,10 +1,20 @@
 import { useEffect, useRef } from "react";
+import profileService from "../api/services/ProfileService";
+import headers from '../utils/headersForRequests.js';
 
 const CreateProfile = () => {
     const requestSent = useRef(false);
     useEffect(() => {
         const form_submit = document.querySelector('.form_submit');
 
+        async function updateProfile(formData) {
+            const data = await profileService.update(formData, headers())
+            if (data.message === "success") {
+                alert('Профиль успешно создан!');
+                localStorage.removeItem('create_profile')
+                window.location.href = '/profile';
+            }
+        }
 
         const handleSubmit = (e) => {
             const form = document.forms[0];
@@ -20,23 +30,7 @@ const CreateProfile = () => {
                 formData.append('avatar', avatar);
 
                 if (!requestSent.current) {
-                    fetch('http://127.0.0.1:8000/api/profile', {
-                        method: 'POST',
-                        headers: {
-                            "Authorization": "Bearer " + localStorage.getItem('token')
-                        },
-                        body: formData
-                    })
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.message === "success") {
-                                alert('Профиль успешно создан!');
-                                localStorage.removeItem('create_profile')
-                                window.location.href = '/profile';
-                            }
-                            console.log(data);
-                        })
-                        .catch(e => console.log(e));
+                    updateProfile(formData);
                 }
             }
         }

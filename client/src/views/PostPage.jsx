@@ -1,5 +1,7 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
+import headers from '../utils/headersForRequests.js';
+import postService from '../api/services/PostService.js';
 
 const PostPage = () => {
     const { id } = useParams();
@@ -9,13 +11,7 @@ const PostPage = () => {
     useEffect(() => {
         async function getPost(id) {
             try {
-                const data = await fetch(`http://127.0.0.1:8000/api/posts/${id}`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    }
-                });
-                const fetchedPost = await data.json();
+                const fetchedPost = await postService.getPostById(id, headers())
                 setPost(fetchedPost);
                 setIsLoading(true);
             } catch (error) {

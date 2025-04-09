@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import headers from '../utils/headersForRequests.js';
+import userService from "../api/services/UserService";
 const Auth = () => {
     const [passwordVisibility, setPasswordVisibility] = useState(false);
     const [passwordValue, setPasswordValue] = useState("");
@@ -11,6 +13,30 @@ const Auth = () => {
     useEffect(() => {
         const form_submit = document.querySelector(".form_submit");
         const form = document.querySelector("form");
+
+        async function login(values) {
+            const data = await userService.loginUser(JSON.stringify({
+                email: values[0],
+                password: values[1],
+            }), { "Content-Type": "application/json" })
+            if (data.message === "success") {
+                alert("Успешная авторизация");
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("role", data.role);
+                auth();
+            }
+        }
+
+        async function auth() {
+            const data = await userService.getMe(headers())
+            if (data.user.id) {
+                if (!data.isProfile) {
+                    localStorage.setItem("create_profile", true);
+                }
+                localStorage.setItem('isLogged', true);
+                window.location.href = "/profile/create";
+            }
+        }
 
         const handleClick = (e) => {
             if (!form.checkValidity()) {
@@ -25,45 +51,7 @@ const Auth = () => {
             inputs.forEach((input) => {
                 values.push(input.value);
             });
-            fetch("http://127.0.0.1:8000/api/user/auth", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: values[0],
-                    password: values[1],
-                }),
-            })
-                .then((r) => r.json())
-                .then((data) => {
-                    if (data.message === "success") {
-                        alert("Успешная авторизация");
-                        localStorage.setItem("token", data.token);
-                        localStorage.setItem("role", data.role);
-                        fetch("http://127.0.0.1:8000/api/user", {
-                            headers: {
-                                "Authorization": "Bearer " + localStorage.getItem("token"),
-                                "Accept": "application/json"
-                            },
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data)
-                                if (data.user.id) {
-                                    if (!data.isProfile) {
-                                        localStorage.setItem("create_profile", true);
-                                    }
-                                    localStorage.setItem('isLogged', true);
-                                    window.location.href = "/profile/create";
-                                }
-                            })
-                            .catch((error) => {
-                                console.error("Ошибка:", error);
-                            });
-                    }
-                })
-                .catch((error) => console.error("Error:", error));
+            login(values)
         };
 
         form_submit.addEventListener("click", handleClick);

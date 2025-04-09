@@ -5,6 +5,9 @@ import Loading from '../components/content/Loading';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { setUsers } from '../features/user/userSlice.js';
+
+import userService from '../api/services/UserService.js';
+import headers from '../utils/headersForRequests.js';
 const GetUsers = () => {
     const users = useSelector((state) => state.user.users)
     const [isLoading, setIsLoading] = useState(false);
@@ -12,13 +15,7 @@ const GetUsers = () => {
 
     useEffect(() => {
         async function getUsers() {
-            const data = await fetch('http://127.0.0.1:8000/api/users', {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-            }).catch(e => console.log(e))
-            const fetchedUsers = await data.json();
+            const fetchedUsers = await userService.getAll(headers());
             dispatch(setUsers(fetchedUsers));
             setIsLoading(true);
         }
@@ -30,13 +27,7 @@ const GetUsers = () => {
         }
 
         async function getUsersBySearch(text) {
-            const data = await fetch(`${process.env.REACT_APP_API_URL}get/user?search=${text}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-            }).catch(e => console.log(e))
-            const fetchedUsers = await data.json();
+            const fetchedUsers = await userService.getUserBySearch(text, headers());
             dispatch(setUsers(fetchedUsers.users));
             setIsLoading(true);
         }

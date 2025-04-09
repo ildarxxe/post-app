@@ -3,6 +3,9 @@ import Post from "../content/Post";
 import { useSelector, useDispatch } from 'react-redux';
 import { setStatePosts } from "../../features/posts/postsSlice";
 import Loading from "./Loading";
+import headers from '../../utils/headersForRequests.js';
+import postService from "../../api/services/PostService.js";
+import userService from '../../api/services/UserService.js';
 
 const PostList = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -13,16 +16,7 @@ const PostList = () => {
     useEffect(() => {
         async function getPosts() {
             try {
-                const data = await fetch("http://127.0.0.1:8000/api/posts", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    }
-                });
-                if (!data.ok) {
-                    throw new Error(`HTTP error! status: ${data.status}`);
-                }
-                const fetchedPosts = await data.json();
+                const fetchedPosts = await postService.getAll(headers())
                 dispatch(setStatePosts(fetchedPosts));
                 setIsLoading(true);
             } catch (error) {
@@ -32,15 +26,7 @@ const PostList = () => {
         }
 
         async function getId() {
-            const res = await fetch('http://127.0.0.1:8000/api/user', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": "Bearer " + localStorage.getItem('token')
-                },
-            });
-
-            const { user } = await res.json();
+            const { user } = await userService.getMe(headers());
             setUserIdAccess(user.id)
         }
 

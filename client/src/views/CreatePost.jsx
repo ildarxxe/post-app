@@ -1,8 +1,17 @@
 import { useEffect, useRef } from "react";
+import headers from '../utils/headersForRequests.js';
+import postService from "../api/services/PostService.js";
 
 const CreatePost = () => {
     const requestSent = useRef(false);
     useEffect(() => {
+        async function create(formData) {
+            const data = await postService.createPost(formData, headers())
+            if (data.message === "success") {
+                window.location.href = "/posts";
+            }
+        }
+
         const submit = document.querySelector(".post_submit");
         submit.addEventListener("click", () => {
             if (!requestSent.current) {
@@ -13,21 +22,7 @@ const CreatePost = () => {
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("description", description);
-                fetch("http://127.0.0.1:8000/api/posts/create", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    },
-                    body: formData,
-                })
-                    .then((r) => r.json())
-                    .then((data) => {
-                        if (data.message === "success") {
-                            alert("Пост успешно создан!");
-                            window.location.href = "/posts";
-                        }
-                    })
-                    .catch((e) => console.log(e));
+                create(formData);
             }
         });
         return () => {

@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setUsers, setUserById } from "../features/admin/adminSlice";
 import Loading from "../components/content/Loading";
+import userService from '../api/services/UserService.js';
+import headers from '../utils/headersForRequests.js';
 
 const Admin = () => {
-    // const [users, setUsers] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [userIsLoading, setUserIsLoading] = useState(false);
 
@@ -16,13 +17,7 @@ const Admin = () => {
     useEffect(() => {
         async function getUsers() {
             try {
-                const data = await fetch("http://127.0.0.1:8000/api/users", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem("token")
-                    }
-                });
-                const fetchedUsers = await data.json();
+                const fetchedUsers = await userService.getAll(headers());
                 dispatch(setUsers(fetchedUsers));
                 setIsLoading(true);
                 setUserIsLoading(false)
@@ -51,14 +46,8 @@ const Admin = () => {
 
         })
 
-        async function getUser(user_id) {
-            const user = await fetch(`http://127.0.0.1:8000/api/users/${user_id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                }
-            })
-            const fetchedUser = await user.json();
+        async function getUser(search) {
+            const fetchedUser = await userService.getUserBySearch(search, headers())
             dispatch(setUserById([fetchedUser]));
             setUserIsLoading(true);
             setIsLoading(false);

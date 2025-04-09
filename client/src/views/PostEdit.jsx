@@ -1,6 +1,10 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import Modal from '../components/content/Modal';
+import userService from '../api/services/UserService.js';
+import headers from '../utils/headersForRequests.js';
+import postService from '../api/services/PostService.js';
+import Alert from '../components/content/Alert.jsx';
 
 const PostPage = () => {
     const { id } = useParams();
@@ -8,22 +12,14 @@ const PostPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState();
     const [userIdAccess, setUserIdAccess] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
 
     // get user_id
     useEffect(() => {
         async function getId() {
-            const res = await fetch('http://127.0.0.1:8000/api/user', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": "Bearer " + localStorage.getItem('token')
-                },
-            });
-
-            const { user } = await res.json();
+            const { user } = await userService.getMe(headers());
             setUserIdAccess(user.id)
         }
-
         getId();
     }, [])
 
@@ -31,13 +27,7 @@ const PostPage = () => {
     useEffect(() => {
         async function getPost(id) {
             try {
-                const data = await fetch(`http://127.0.0.1:8000/api/posts/${id}`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem('token')
-                    }
-                });
-                const fetchedPost = await data.json();
+                const fetchedPost = await postService.getPostById(id, headers());
                 setPost(fetchedPost);
                 setIsLoading(true);
                 setValue(fetchedPost[0].description)
@@ -58,6 +48,12 @@ const PostPage = () => {
 
 
     //update post
+    async function update(forma) {
+        const data = await postService.update(id, forma, headers())
+        if (data.message === "success") {
+            setShowAlert(true);
+        }
+    }
     const handleSubmit = () => {
         const file = document.querySelector('.post_file').files[0] ?? null;
         const desc = document.querySelector('#description').value;
@@ -65,37 +61,21 @@ const PostPage = () => {
         forma.append("file", file);
         forma.append("description", desc);
 
-        fetch(`http://127.0.0.1:8000/api/posts/${id}`, {
-            method: 'POST',
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem('token')
-            },
-            body: forma,
-        })
-            .then((r) => r.json())
-            .then((data) => {
-                if (data.message === "success") {
-                    alert('Пост успешно изменен!')
-                    window.location.reload();
-                }
-            })
-            .catch((e) => console.log(e));
+        update(forma);
     };
 
     const [showModal, setShowModal] = useState(false);
 
     //delete post
     useEffect(() => {
+        async function deletePost() {
+            const data = await postService.deletePost(id, headers());
+            if (data.message == "success") {
+                window.location.href = '/posts'
+            }
+        }
         const handleConfirmDelete = () => {
-            fetch(`http://127.0.0.1:8000/api/posts/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem('token')
-                }
-            })
-                .then((r) => r.json())
-                .then((data) => window.location.href = '/posts')
-                .catch((e) => console.log(e));
+            deletePost()
         };
 
         const handleCancelDelete = () => {
@@ -121,6 +101,7 @@ const PostPage = () => {
 
     return (
         <div className="postPage">
+            {showAlert ? <Alert text={'Пост успешно изменен!'} /> : ""}
             {isLoading ? (
                 post ? (
                     <div className="form-posts w-100 m-auto">

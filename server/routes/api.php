@@ -16,7 +16,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', [UserController::class, 'get']); // read
     Route::get('/users', [UserController::class, 'getAll']);
-    Route::get('/get/user', [UserController::class, 'getById']);
+    Route::get('/users/{id}', [UserController::class, 'getUserById']);
+    Route::get('/get/user', [UserController::class, 'getBySearch']);
     Route::delete('/user', [UserController::class, 'delete']); // delete
 
     Route::get('/profile', [ProfileController::class, 'get']);  // read
@@ -30,7 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //admin
     Route::middleware('admin')->group(function () {
-        Route::get('/users/{id}', [AdminController::class, 'getUserById']); // admin read
         Route::get('/profile/{id}', [AdminController::class, 'getProfileById']);
     });
 });

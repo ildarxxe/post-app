@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router'
+import userService from '../api/services/UserService.js';
+import adminService from '../api/services/AdminService.js';
+import headers from '../utils/headersForRequests.js';
 const UserPage = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [profile, setProfile] = useState(null);
@@ -9,25 +12,13 @@ const UserPage = () => {
     const { id } = useParams();
     useEffect(() => {
         async function getUser() {
-            const data = await fetch(`http://127.0.0.1:8000/api/users/${id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                }
-            });
-            const user = await data.json();
+            const user = await userService.getUserById(id, headers());
             setUserInfo(user);
         }
         getUser();
 
         async function getProfile() {
-            const data = await fetch(`http://127.0.0.1:8000/api/profile/${id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                }
-            });
-            const fetchedProfile = await data.json();
+            const fetchedProfile = await adminService.getProfileById(id, headers());
             setProfile(fetchedProfile);
         }
         getProfile();
